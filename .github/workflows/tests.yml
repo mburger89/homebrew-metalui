@@ -1,0 +1,22 @@
+name: brew test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: xcode-27  # Swift 6.4, as MetalUI's own CI
+    steps:
+    - uses: actions/checkout@v7
+    - name: Tap this checkout
+      run: |
+        mkdir -p "$(brew --repository)/Library/Taps/mburger89"
+        ln -s "$GITHUB_WORKSPACE" "$(brew --repository)/Library/Taps/mburger89/homebrew-metalui"
+    - name: Install from source
+      run: brew install --build-from-source mburger89/metalui/metalui
+    - name: Test
+      run: brew test mburger89/metalui/metalui
+    - name: Audit
+      run: brew audit --strict mburger89/metalui/metalui
