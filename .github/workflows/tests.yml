@@ -20,3 +20,32 @@ jobs:
       run: brew test mburger89/metalui/metalui
     - name: Audit
       run: brew audit --strict mburger89/metalui/metalui
+
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v7
+    - name: Set up Homebrew
+      run: |
+        if ! command -v brew >/dev/null; then
+          NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          echo "/home/linuxbrew/.linuxbrew/bin" >> "$GITHUB_PATH"
+        fi
+        /home/linuxbrew/.linuxbrew/bin/brew --version
+    - name: Tap this checkout
+      run: |
+        eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+        mkdir -p "$(brew --repository)/Library/Taps/mburger89"
+        ln -s "$GITHUB_WORKSPACE" "$(brew --repository)/Library/Taps/mburger89/homebrew-metalui"
+    - name: Install
+      run: |
+        eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+        brew install mburger89/metalui/metalui
+    - name: Test
+      run: |
+        eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+        brew test mburger89/metalui/metalui
+    - name: Audit
+      run: |
+        eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+        brew audit --strict mburger89/metalui/metalui
